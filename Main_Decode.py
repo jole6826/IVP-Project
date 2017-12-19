@@ -6,13 +6,6 @@ import lib.huffmanCoding as hc
 import pickle
 
 
-dumpHuffman = True
-dumpRGB = True
-pathToImgs = "/home/jole/Dokumente/Studium/Master/1_Semester_WS1718/IVP/Project-Excercise/Code/imgs"
-wallaby = "wallaby.png"
-lena = "lena512color.tiff"
-moon = 'MoonImage.tif'
-imgPath = os.path.join(pathToImgs,moon)
 
 # Read and decode Hufmann coded images
 

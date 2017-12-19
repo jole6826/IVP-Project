@@ -1,4 +1,3 @@
-import struct
 import numpy as np
 
 class HufmannTree(object):
@@ -171,23 +170,4 @@ def lowest_prob_pair(p):
     sorted_p = sorted(p.items(), key=lambda (i,pi): pi)
     return sorted_p[0][0], sorted_p[1][0]
 
-def pack_bits_to_bytes(bitstream):
-    n_bytes = len(bitstream)/8
-    bytes_stream = np.zeros(n_bytes, dtype=int)
-    for m in range(n_bytes):
-        bytes_stream[m] = eval('0b' + bitstream[m*8:(m*8+8)])
 
-    str_bytes = struct.pack('B'*len(bytes_stream), *bytes_stream)
-    return str_bytes
-
-
-def unpack_bytes_to_bits(byte_string):
-    unpacked_bytes = struct.unpack('B'*len(byte_string), byte_string)
-
-    bitstream = ''
-    for byte in unpacked_bytes:
-        #create bit string from byte:
-        bits = bin(byte)
-        bitstream = bitstream + bits[2:].zfill(8)
-
-    return bitstream
