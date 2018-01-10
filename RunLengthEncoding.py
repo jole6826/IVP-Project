@@ -12,7 +12,7 @@ def runLength(pic):
     value = picVector[0]
     # ! BEACHTEN: count = Anzahl der Wiederholungen
     #   beim Wiederherstellen -> Anzahl des Wertes = count + 1
-    count = 0
+    count = 1
     encoded = []
     for index in range(1, len(picVector)):
         if value == picVector[index]:
@@ -21,7 +21,7 @@ def runLength(pic):
             # append = anhaengen
             encoded.append([value, count])
             value = picVector[index]
-            count = 0
+            count = 1
     encoded_vec = np.array(encoded).reshape(len(encoded) * 2)
 
     return encoded_vec

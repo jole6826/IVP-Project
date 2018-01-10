@@ -9,7 +9,7 @@ from RunLengthEncoding import runLength
 files = glob.glob('imgs/*.jpg')
 
 
-for file in files
+for file in files:
     filename = basename(files[0])[:-4]
     pic = cv2.imread(file)
     pickle.dump(pic, open(filename+'.p','wb'), protocol=pickle.HIGHEST_PROTOCOL)
