@@ -13,7 +13,7 @@ wallaby = "wallaby.png"
 lena = "lena512color.tiff"
 moon = 'MoonImage.tif'
 
-imgPath = os.path.join(pathToImgs, moon)
+imgPath = os.path.join(pathToImgs, lena)
 img = cv2.imread(imgPath)
 shape = img.shape
 if len(shape) == 3:
@@ -31,25 +31,25 @@ else:
 # width = 1024
 
 # Crop for lena
-# loR = 0
-# loC = 0
-# width = 512
-# height = width
-
-# Crop for moon
 loR = 0
 loC = 0
-width = maxWidth
-height = maxHeight
+width = 256
+height = width
+
+# Crop for moon
+# loR = 0
+# loC = 0
+# width = maxWidth
+# height = maxHeight
 assert (loR <= maxWidth and loC <= maxHeight and (loR+height) <= maxHeight and (loC+width) <= maxWidth)
 img = img[loR:loR+height,loC:loC+width,:]
 
-test=np.zeros([10,10])
+
 
 # Encoding using Encoding Framework
-outPath = os.path.join(pathToFile,"bin","moon")
+outPath = os.path.join(pathToFile,"bin","lena2")
 ef.encodeWithHuffman(img, outPath, dumpHuffman=True, dumpRGB=True)
-ef.encodeWithRunLength(img,outPath,dumpRunLength=True)
+ef.encodeWithRunLength(img, outPath,dumpRunLength=True)
 
 # decoding with Decoding Framework
 decodedHuffImg = df.decodeWithHuffman(outPath)
@@ -59,7 +59,7 @@ decodedRlImg = df.decodeWithRunLegth(outPath)
 
 cv2.imshow('original', img)
 cv2.waitKey(0)
-cv2.imshow('decoded', decodedHuffImg)
+cv2.imshow('decoded', decodedRlImg)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
 cv2.destroyAllWindows()

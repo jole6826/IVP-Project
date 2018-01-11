@@ -32,4 +32,4 @@ def pad_bits(data_bits):
     else:
         padded_bits = '{:b}'.format(n_zero_pad).zfill(3) + data_bits + '{:b}'.format(0).zfill(n_zero_pad)
 
-        return padded_bits
+    return padded_bits
