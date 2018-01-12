@@ -40,9 +40,10 @@ def decodeWithRunLegth(file):
     file = file + '_rl.bin'
     with open(file, 'rb') as f:
         [height, width, nChannels] = pickle.load(f)
-        rl_vec = pickle.load(f)
+        rl_vals = pickle.load(f)
+        rl_counts = pickle.load(f)
 
-    rl_data = np.reshape(rl_vec, [len(rl_vec)/2, 2])
+    rl_data = np.vstack((rl_vals, rl_counts))
 
     # for loops over rl_data to restore values in img_vec
     # reshape img_vec to real shape before return
@@ -50,24 +51,20 @@ def decodeWithRunLegth(file):
     # for ix in xrange(0,len(rl_data)):
 
     # first block
-    val1 = rl_data[0,0]
-    n1 = rl_data[0,1]
+    val1 = rl_vals[0]
+    n1 = rl_counts[0]
     img_vec = np.ones([1,n1])*val1
-
-    for val, nElements in rl_data[1::,::]:
-        #print ix
-        # val = rl_data[ix,0]
-        # nElements = rl_data[ix,1] + 1
+    img_vec2 = np.zeros([1,height*width*nChannels])
+    ix = 0
+    #for val, nElements in rl_data[::, 1::].T:
+    for val, nElements in rl_data[::, ::].T:
         n = nElements
-        #img_vec.append(np.ones([nElements,1])*val)
-        newBlock = np.ones([1,n],dtype=np.uint8)*val
-        # if ix == 0:
-        #     img_vec = newBlock
-        # else:
-        #     img_vec = np.hstack((img_vec, newBlock))
-        img_vec = np.hstack((img_vec, newBlock))
+        #newBlock = np.ones([1,n],dtype=np.uint8)*val
+        img_vec2[:,ix:ix+n] = val
+        #img_vec = np.hstack((img_vec, newBlock))
+        ix += n
 
-    rgbRows = np.reshape(img_vec, [nChannels, height * width])
+    rgbRows = np.reshape(img_vec2, [nChannels, height * width])
     r_flat = rgbRows[0, :]
     g_flat = rgbRows[1, :]
     b_flat = rgbRows[2, :]
