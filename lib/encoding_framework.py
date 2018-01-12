@@ -5,7 +5,7 @@ import huffmanCoding as hc
 import pickle
 
 def print_usage():
-    print "Ohps, something went wrong. Check parameters"
+    print("Ohps, something went wrong. Check parameters")
 
 
 def flattenImg(img):
