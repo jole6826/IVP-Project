@@ -1,51 +1,15 @@
 import os
 import cv2
+import matplotlib.pyplot as plt
 import lib.encoding_framework as ef
 import lib.decoding_framework as df
 import numpy as np
 from os.path import basename
 import glob
 
-
-
 dumpHuffman = True
 dumpRGB = True
 pathToFile = os.path.dirname(__file__)
-# pathToImgs = os.path.join(pathToFile,"imgs")
-# wallaby = "wallaby.png"
-# lena = "lena512color.tiff"
-# moon = 'MoonImage.tif'
-#
-# imgPath = os.path.join(pathToImgs, lena)
-# img = cv2.imread(imgPath)
-# shape = img.shape
-# if len(shape) == 3:
-#     maxHeight = shape[0]
-#     maxWidth = shape[1]
-#     nChannels = shape[2]
-# else:
-#     maxHeight = shape[0]
-#     maxWidth = shape[1]
-#     nChannels = 1
-#
-# # Crop for wallaby
-# # loR = 300
-# # loC = 700
-# # width = 1024
-#
-# # Crop for lena
-# loR = 0
-# loC = 0
-# width = 256
-# height = width
-#
-# # Crop for moon
-# # loR = 0
-# # loC = 0
-# # width = maxWidth
-# # height = maxHeight
-# assert (loR <= maxWidth and loC <= maxHeight and (loR+height) <= maxHeight and (loC+width) <= maxWidth)
-# img = img[loR:loR+height,loC:loC+width,:]
 
 files = glob.glob('imgs/s_*.jpg')
 ix = 0
@@ -59,18 +23,29 @@ for file in files:
     ef.encodeWithRunLength(img, outPath,dumpRunLength=True)
 
     # decoding with Decoding Framework
-    decodedHuffImg = df.decodeWithHuffman(outPath)
-    decodedRlImg = df.decodeWithRunLegth(outPath)
+    decodedHMImg = df.decodeWithHuffman(outPath)
+    decodedRLImg = df.decodeWithRunLegth(outPath)
+
+    diffHM = np.abs(img.astype(np.float)-decodedHMImg.astype(np.float))
+    diffRL = np.abs(img.astype(np.float)-decodedRLImg.astype(np.float))
+
+    # Display original and decoded images as well as error images
+    cv2.imshow('original', img)
+    cv2.waitKey(0)
+    cv2.imshow('Run length decoded', decodedRLImg)
+    cv2.waitKey(0)
+    cv2.imshow('Huffman decoded', decodedHMImg)
+    cv2.waitKey(0)
+    cv2.imshow('RL decoded error', diffRL.astype(np.uint8))
+    cv2.waitKey(0)
+    cv2.imshow('Huffman decoded error', diffHM.astype(np.uint8))
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
     ix += 1
 
 
 
-cv2.imshow('original', img)
-cv2.waitKey(0)
-cv2.imshow('decoded', decodedRlImg)
-cv2.waitKey(0)
-cv2.destroyAllWindows()
-cv2.destroyAllWindows()
 
 
 

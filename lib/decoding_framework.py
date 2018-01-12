@@ -21,22 +21,43 @@ def readHuffmanBitstream(file):
 
     return img_data, cb, shape
 
-def decodeWithHuffman(file):
-    file = file + '_hm.bin'
-    img_data, cb, shape = readHuffmanBitstream(file)
-    rgbFlat_decoded = hc.huffmanDecoder(img_data, cb)
-    rgbRows = np.reshape(rgbFlat_decoded, [shape[2], shape[0] * shape[1]])
+def fromVecToRGB(rgb_vec, shape, order = 'bgr'):
+    '''
+    Function that converts a vector containing a rgb image in the form rrrgggbbb values to
+    a MxNxC matrix where M,N,C are stored in shape = [M, N, C]
+    '''
+    rgbRows = np.reshape(rgb_vec, [shape[2], shape[0] * shape[1]])
     r_flat = rgbRows[0, :]
     g_flat = rgbRows[1, :]
     b_flat = rgbRows[2, :]
     rgb = np.zeros((shape[0], shape[1], 3,), dtype=np.uint8)
-    rgb[:, :, 0] = np.reshape(b_flat, [shape[0], shape[1]])
-    rgb[:, :, 1] = np.reshape(g_flat, [shape[0], shape[1]])
-    rgb[:, :, 2] = np.reshape(r_flat, [shape[0], shape[1]])
+    if order == 'bgr':
+        # for open cv
+        rgb[:, :, 0] = np.reshape(b_flat, [shape[0], shape[1]])
+        rgb[:, :, 1] = np.reshape(g_flat, [shape[0], shape[1]])
+        rgb[:, :, 2] = np.reshape(r_flat, [shape[0], shape[1]])
+    elif order == 'rgb':
+        # for plotting with pyplot
+        rgb[:, :, 2] = np.reshape(b_flat, [shape[0], shape[1]])
+        rgb[:, :, 1] = np.reshape(g_flat, [shape[0], shape[1]])
+        rgb[:, :, 0] = np.reshape(r_flat, [shape[0], shape[1]])
+    else:
+        print('Format of order is not known, must be rgb (pyplot) or bgr (openCV)')
+        return 2
+    return rgb
+
+
+def decodeWithHuffman(file):
+    file = file + '_hm.bin'
+    img_data, cb, shape = readHuffmanBitstream(file)
+    rgbFlat_decoded = hc.huffmanDecoder(img_data, cb)
+    rgb = fromVecToRGB(rgbFlat_decoded,shape,order='bgr')
 
     return rgb
 
 def decodeWithRunLegth(file):
+
+    # loading data from .bin file
     file = file + '_rl.bin'
     with open(file, 'rb') as f:
         [height, width, nChannels] = pickle.load(f)
@@ -45,31 +66,14 @@ def decodeWithRunLegth(file):
 
     rl_data = np.vstack((rl_vals, rl_counts))
 
-    # for loops over rl_data to restore values in img_vec
-    # reshape img_vec to real shape before return
-
-    # for ix in xrange(0,len(rl_data)):
-
-    # first block
-    val1 = rl_vals[0]
-    n1 = rl_counts[0]
-    img_vec = np.ones([1,n1])*val1
-    img_vec2 = np.zeros([1,height*width*nChannels])
+    # reconstruction of original rgb image
+    img_vec = np.zeros([1,height*width*nChannels])
     ix = 0
-    #for val, nElements in rl_data[::, 1::].T:
     for val, nElements in rl_data[::, ::].T:
         n = nElements
-        #newBlock = np.ones([1,n],dtype=np.uint8)*val
-        img_vec2[:,ix:ix+n] = val
-        #img_vec = np.hstack((img_vec, newBlock))
+        img_vec[:,ix:ix+n] = val
         ix += n
 
-    rgbRows = np.reshape(img_vec2, [nChannels, height * width])
-    r_flat = rgbRows[0, :]
-    g_flat = rgbRows[1, :]
-    b_flat = rgbRows[2, :]
-    rgb = np.zeros((height, width, 3,), dtype=np.uint8)
-    rgb[:, :, 0] = np.reshape(b_flat, [height, width])
-    rgb[:, :, 1] = np.reshape(g_flat, [height, width])
-    rgb[:, :, 2] = np.reshape(r_flat, [height, width])
+    rgb = fromVecToRGB(img_vec,[height,width,nChannels], order='bgr')
+
     return rgb.astype(np.uint8)
