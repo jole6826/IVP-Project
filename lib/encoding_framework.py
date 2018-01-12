@@ -68,10 +68,8 @@ def encodeWithRunLength(img, outPath, dumpRunLength = True, dumpRGB = False):
 
     rgbFlat = np.hstack((rgbFlat, rgbFlat[-1]+1))
     ### run length ######################################################################
-    value = rgbFlat[0]
     prevValue = rgbFlat[0]
-    # ! BEACHTEN: count = Anzahl der Wiederholungen
-    #   beim Wiederherstellen -> Anzahl des Wertes = count + 1
+
     count = 1
     encoded = []
     for currValue in rgbFlat[1::]:
@@ -93,15 +91,19 @@ def encodeWithRunLength(img, outPath, dumpRunLength = True, dumpRGB = False):
 
 
 
-    encoded_vec = np.array(encoded).reshape(len(encoded) * 2)
-    encoded_vec = encoded_vec.astype(np.uint16)
+
     encoded_vals = np.array(encoded)[:,0].astype(np.uint8)
-    encoded_counts = np.array(encoded)[:,1].astype(np.uint16)
+    encoded_counts = np.array(encoded)[:,1]
+
+    if max(encoded_counts > 255):
+        encoded_counts = encoded_counts.astype(np.uint16)
+    else:
+        encoded_counts = encoded_counts.astype(np.uint8)
+
     if dumpRunLength:
         dump_fname = outPath + "_rl.bin"
         with open(os.path.join(dump_fname), 'wb') as f:
             pickle.dump([height, width, nChannels], f, protocol=pickle.HIGHEST_PROTOCOL)
-            # pickle.dump(encoded_vec, f, 1)
             pickle.dump(encoded_vals, f, 1)
             pickle.dump(encoded_counts, f, 1)
 
