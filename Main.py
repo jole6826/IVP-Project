@@ -18,7 +18,7 @@ for file in files:
     img = cv2.imread(file)
 
     # Encoding using Encoding Framework
-    outPath = os.path.join(pathToFile,"bin","test" + str(ix))
+    outPath = os.path.join(pathToFile,"bin",filename + str(ix))
     ef.encodeWithHuffman(img, outPath, dumpHuffman=True, dumpRGB=True)
     ef.encodeWithRunLength(img, outPath,dumpRunLength=True)
 
