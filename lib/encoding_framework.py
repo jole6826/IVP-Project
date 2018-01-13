@@ -95,10 +95,13 @@ def encodeWithRunLength(img, outPath, dumpRunLength = True, dumpRGB = False):
     encoded_vals = np.array(encoded)[:,0].astype(np.uint8)
     encoded_counts = np.array(encoded)[:,1]
 
-    if max(encoded_counts > 255):
+    if max(encoded_counts) < 255:
+        encoded_counts = encoded_counts.astype(np.uint8)
+    elif max(encoded_counts) < 65535:
         encoded_counts = encoded_counts.astype(np.uint16)
     else:
-        encoded_counts = encoded_counts.astype(np.uint8)
+        encoded_counts = encoded_counts.astype(np.uint32)
+
 
     if dumpRunLength:
         dump_fname = outPath + "_rl.bin"
