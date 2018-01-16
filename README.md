@@ -1,6 +1,6 @@
-## IVP-Project
+### IVP-Project
 
-# Hufmann and Run Length Encoding and decoding
+## Hufmann and Run Length Encoding and decoding
 
 ***
 
