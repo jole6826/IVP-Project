@@ -38,25 +38,6 @@ def huffmanEncoder(signal,cBook):
     return coded
 
 
-def fastHuffmanDecoder(bitstream, cb_tree):
-    decoded = np.zeros(len(bitstream))
-
-    idx_sample = 0
-    cb_tree_iterator = cb_tree
-    for bit in bitstream:
-        if (bit == '0') & (cb_tree_iterator.node0 != None) & (cb_tree_iterator.node1 != None):
-            cb_tree_iterator = cb_tree_iterator.node0
-        elif (bit == '1') & (cb_tree_iterator.node0 != None) & (cb_tree_iterator.node1 != None):
-            cb_tree_iterator = cb_tree_iterator.node1
-
-        if (cb_tree_iterator.node0 == None) & (cb_tree_iterator.node1 == None):
-            decoded[idx_sample] = cb_tree_iterator.data
-            idx_sample += 1
-            cb_tree_iterator = cb_tree
-
-    return decoded[0:idx_sample]
-
-
 def huffmanDecoder(bitstream, cBook):
     inv_cBook = {bit_code: value for value, bit_code in cBook.iteritems()}
     nSamples_max = len(bitstream) / min([len(key) for key in inv_cBook.keys()]) + 1
@@ -119,20 +100,6 @@ def tree2codebook(huffman_tree, current_code):
     else:
         return dict({str(huffman_tree.data): current_code})
 
-def createHuffmanCodebookFromHist(hist,vals):
-    # function to create huffman codebook using probabilities of each symbol
-    # p is an array that contains the symbols p[:,0] and probabilities p[:,1]
-    # based on https://gist.github.com/mreid/fdf6353ec39d050e972b
-
-    nSamples = hist.size
-    prob = np.float32(hist) / nSamples
-    prob = prob[hist != 0]
-    vals = vals[hist != 0]
-    p = zip(map(str,vals),prob)
-    p = dict(p)
-
-    c = huffmanCb(p)
-    return c
 
 def huffmanCb(p):
     '''used recursively to create hufmann codebook from input data

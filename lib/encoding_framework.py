@@ -3,39 +3,19 @@ import os
 import bit_handling as bh
 import huffmanCoding as hc
 import pickle
+import helpers as help
 
 def print_usage():
     print("Ohps, something went wrong. Check parameters")
 
 
-def flattenImg(img):
-    shape = img.shape
-
-    if len(shape) == 3:
-        bFlat = img[:, :, 0].flatten()
-        gFlat = img[:, :, 1].flatten()
-        rFlat = img[:, :, 2].flatten()
-        rgbFlat = np.hstack((rFlat, gFlat, bFlat))
-        height = shape[0]
-        width = shape[1]
-        nChannels = shape[2]
-    elif len(shape) == 1:
-        rgbFlat = img.flatten()
-        height = shape[0]
-        width = shape[1]
-        nChannels = 1
-    else:
-        print_usage()
-        return 2
-
-    return rgbFlat, height, width, nChannels
 
 def encodeWithHuffman(img,outPath,dumpHuffman = True, dumpRGB = False):
     # img       - is the image that shall be encoded using Huffman
     #           should be 1 or 3 channel image matrix
     # outPath   - is the path where it should be saved to
     #            will be saved as outPath.bin
-    rgbFlat, height, width, nChannels = flattenImg(img)
+    rgbFlat, height, width, nChannels = help.flattenImg(img)
 
     codebook, codebook_tree = hc.createHuffmanCodebook(rgbFlat)
     data_bits = hc.huffmanEncoder(rgbFlat, codebook)
@@ -64,7 +44,7 @@ def encodeWithRunLength(img, outPath, dumpRunLength = True, dumpRGB = False):
     # outPath   - is the path where it should be saved to
     #            will be saved as outPath.bin
 
-    rgbFlat, height, width, nChannels = flattenImg(img)
+    rgbFlat, height, width, nChannels = help.flattenImg(img)
 
     rgbFlat = np.hstack((rgbFlat, rgbFlat[-1]+1))
     ### run length ######################################################################
@@ -80,18 +60,6 @@ def encodeWithRunLength(img, outPath, dumpRunLength = True, dumpRGB = False):
             prevValue = currValue
             count = 1
 
-    # for index in range(0, len(rgbFlat)+1):
-    #     if value == rgbFlat[index]:
-    #         count += 1
-    #     else:
-    #         # append = anhaengen
-    #         encoded.append([value, count])
-    #         value = rgbFlat[index]
-    #         count = 1
-
-
-
-
     encoded_vals = np.array(encoded)[:,0].astype(np.uint8)
     encoded_counts = np.array(encoded)[:,1]
 
@@ -101,7 +69,6 @@ def encodeWithRunLength(img, outPath, dumpRunLength = True, dumpRGB = False):
         encoded_counts = encoded_counts.astype(np.uint16)
     else:
         encoded_counts = encoded_counts.astype(np.uint32)
-
 
     if dumpRunLength:
         dump_fname = outPath + "_rl.bin"
